@@ -1,0 +1,9 @@
+<fragment android:id="@+id/tab_talkback" ...>
+    <action
+        android:id="@+id/action_talkback_to_gestures"
+        app:destination="@id/tab_gestures">
+        <argument
+            android:name="someData"
+            app:argType="string" />
+    </action>
+</fragment>

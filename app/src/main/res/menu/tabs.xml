@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tab_talkback"
+        android:icon="@drawable/tab_talkback"
+        android:title="@string/talkback_tab" />
+
+    <item
+        android:id="@+id/tab_gestures"
+        android:icon="@drawable/tab_gestures"
+        android:title="@string/gestures_tab" />
+
+    <item
+        android:id="@+id/tab_actions"
+        android:icon="@drawable/tab_actions"
+        android:title="@string/actions_tab" />
+
+    <item
+        android:id="@+id/tab_more"
+        android:icon="@drawable/tab_more"
+        android:title="@string/more_tab" />
+</menu>

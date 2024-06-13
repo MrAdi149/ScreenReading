@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "851574054433",
+    "project_id": "screenarrator",
+    "storage_bucket": "screenarrator.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:851574054433:android:f9a2bc2678923f5baa4d60",
+        "android_client_info": {
+          "package_name": "com.example.screenarrator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdmQupnThFVz85uUm_8rxWuIvzKExNtP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

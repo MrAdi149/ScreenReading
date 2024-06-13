@@ -1,0 +1,27 @@
+package com.example.screenarrator.views.actions
+
+import android.content.Context
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
+import android.util.AttributeSet
+import android.view.accessibility.AccessibilityEvent
+import androidx.appcompat.widget.AppCompatTextView
+
+class LinkTextView(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0
+)  : AppCompatTextView(context, attrs, defStyle) {
+
+    init {
+        autoLinkMask = Linkify.ALL
+        movementMethod = LinkMovementMethod.getInstance()
+        linksClickable = true // Make links clickable
+        isClickable = false // Prevent the entire view from being clickable
+    }
+
+    override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent?): Boolean {
+        event?.className = javaClass.name
+        return super.dispatchPopulateAccessibilityEvent(event)
+    }
+}

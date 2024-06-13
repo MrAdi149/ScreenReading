@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Instructions -->
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_1" />
+
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_2" />
+
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_3" />
+
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_4" />
+
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_5" />
+
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_6" />
+
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_7" />
+
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_8" />
+
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_9" />
+
+        <TextView style="@style/Widget.TextView.Training"
+            android:text="@string/action_copy_instruction_10" />
+
+        <!-- Action -->
+        <com.example.screenarrator.views.TrainingField
+            style="@style/Widget.EditText.Training"
+            android:id="@+id/trainingField"
+            android:text="@string/action_copy_text"/>
+    </LinearLayout>
+</ScrollView>

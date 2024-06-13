@@ -1,0 +1,47 @@
+package com.example.screenarrator.widgets
+
+import android.app.Activity
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.example.screenarrator.helpers.Events
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+
+abstract class BaseFragment: Fragment() {
+
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+    lateinit var events: Events
+
+    abstract fun getLayoutId(): Int
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        firebaseAnalytics = Firebase.analytics
+        events = Events(firebaseAnalytics)
+    }
+
+    fun onCreatedView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return inflater.inflate(getLayoutId(), container, false)
+    }
+
+    open fun willShow(){
+
+    }
+
+    inline fun <reified T: Activity> startActivity(requestCode: Int = -1, options: Bundle? = null, noinline init: Intent.() -> Unit = {}){
+        context?.let { context ->
+            val intent = Intent(context, T::class.java)
+            intent.init()
+            startActivityForResult(intent, requestCode, options)
+        }
+    }
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tabs"
+    app:startDestination="@id/tab_talkback">
+
+    <fragment
+        android:id="@+id/tab_talkback"
+        android:name="com.example.screenarrator.tabs.talkback.TalkBackFragment"
+        android:layout="@layout/fragment_list"
+        android:label="@string/talkback_title"
+        tools:layout="@layout/fragment_list">
+        <action
+            android:id="@+id/action_tab_talkback_to_tab_gestures"
+            app:destination="@id/tab_gestures" />
+        <action
+            android:id="@+id/action_tab_talkback_to_tab_actions"
+            app:destination="@id/tab_actions" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/tab_gestures"
+        android:name="com.example.screenarrator.tabs.gestures.GesturesFragment"
+        android:label="@string/gestures_title"
+        tools:layout="@layout/fragment_list"/>
+
+    <fragment
+        android:id="@+id/tab_actions"
+        android:name="com.example.screenarrator.tabs.actions.ActionsFragment"
+        android:label="@string/actions_title"
+        tools:layout="@layout/fragment_list">
+        <action
+            android:id="@+id/action_tab_actions_to_tab_more"
+            app:destination="@id/tab_more" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/tab_more"
+        android:name="com.example.screenarrator.tabs.more.MoreFragment"
+        android:label="@string/more_title"
+        tools:layout="@layout/fragment_list" >
+        <action
+            android:id="@+id/action_tab_more_to_tab_gestures"
+            app:destination="@id/tab_gestures" />
+    </fragment>
+</navigation>
