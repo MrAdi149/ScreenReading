@@ -11,12 +11,12 @@ import com.example.screenarrator.model.Topic
 import com.example.screenarrator.widgets.ListFragment
 import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 
-class MoreFragment : ListFragment(){
+class MoreFragment: ListFragment() {
 
     override val adapter = ListDelegationAdapter(
         textResourceAdapterDelegate(),
         headerAdapterDelegate(),
-        itemAdapterDelegate<Topic>{ topic ->
+        itemAdapterDelegate<Topic> { topic ->
             onTopicClicked(topic)
         }
     )

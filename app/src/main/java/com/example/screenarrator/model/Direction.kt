@@ -17,13 +17,13 @@ enum class Direction(var fingers: Int = 1) {
     TOP_LEFT,
     UNKNOWN;
 
-    fun title(context: Context): SpannableString{
+    fun title(context: Context): SpannableString {
         return context.getSpannable(title)
     }
 
     val title: Int
         get() {
-            return when (this){
+            return when (this) {
                 UP -> R.string.direction_up
                 TOP_RIGHT -> R.string.direction_top_right
                 RIGHT -> R.string.direction_right
@@ -40,8 +40,8 @@ enum class Direction(var fingers: Int = 1) {
         return "${super.toString()}($fingers)"
     }
 
-    companion object{
-        fun feedback(context: Context, directions: Array<Direction>): String{
+    companion object {
+        fun feedback(context: Context, directions: Array<Direction>): String {
             return directions.joinToString(separator = ", ") { direction ->
                 direction.title(context)
             }

@@ -25,7 +25,7 @@ abstract class BaseFragment: Fragment() {
         events = Events(firebaseAnalytics)
     }
 
-    fun onCreatedView(
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -33,11 +33,11 @@ abstract class BaseFragment: Fragment() {
         return inflater.inflate(getLayoutId(), container, false)
     }
 
-    open fun willShow(){
-
+    open fun willShow() {
+        // Can be overridden
     }
 
-    inline fun <reified T: Activity> startActivity(requestCode: Int = -1, options: Bundle? = null, noinline init: Intent.() -> Unit = {}){
+    inline fun <reified T : Activity> startActivity(requestCode: Int = -1, options: Bundle? = null, noinline init: Intent.() -> Unit = {}) {
         context?.let { context ->
             val intent = Intent(context, T::class.java)
             intent.init()

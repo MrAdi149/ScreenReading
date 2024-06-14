@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import com.example.screenarrator.R
 import com.example.screenarrator.adapters.headerAdapterDelegate
+import com.example.screenarrator.adapters.textAdapterDelegate
 import com.example.screenarrator.adapters.textResourceAdapterDelegate
 import com.example.screenarrator.adapters.trainingAdapterDelegate
 import com.example.screenarrator.extensions.doSetAction
@@ -36,14 +37,14 @@ class ActionsFragment: ListFragment() {
         }
     )
 
-    private fun onActionClicked(action: Action){
+    private fun onActionClicked(action: Action) {
         context?.let { context ->
-            if(!Accessibility.screenReader(context)){
+            if (!Accessibility.screenReader(context)) {
                 context.showDialog(R.string.actions_talkback_disabled_title, R.string.actions_talkback_disabled_message)
                 return
             }
 
-            startActivity<ActionActivity>(REQUEST_CODE){
+            startActivity<ActionActivity>(REQUEST_CODE) {
                 doSetAction(action)
             }
         }
@@ -52,13 +53,13 @@ class ActionsFragment: ListFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(resultCode == Activity.RESULT_OK){
+        if (resultCode == Activity.RESULT_OK) {
             adapter.notifyDataSetChanged()
             activity?.requestReview()
         }
     }
 
-    companion object{
+    companion object {
         private val REQUEST_CODE = 1337
     }
 }

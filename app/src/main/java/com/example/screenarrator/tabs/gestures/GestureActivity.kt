@@ -29,7 +29,7 @@ import com.example.screenarrator.widgets.ToolbarActivity
 import java.util.*
 import kotlin.concurrent.schedule
 
-class GestureActivity : ToolbarActivity(), GestureViewCallback {
+class GestureActivity: ToolbarActivity(), GestureViewCallback {
 
     private val TAG = "GestureActivity"
     private lateinit var titleTextView: TextView
@@ -39,11 +39,11 @@ class GestureActivity : ToolbarActivity(), GestureViewCallback {
     private lateinit var container: FrameLayout
 
     private val gestures: ArrayList<Gesture> by lazy {
-        intent.getSerializableExtra(Constants.GESTURES_EXTRA) as? ArrayList<Gesture> ?: arrayListOf()
+        intent.getGestures() ?: arrayListOf()
     }
 
     private val gesture: Gesture by lazy {
-        gestures.firstOrNull() ?: Gesture.ONE_FINGER_TOUCH
+        gestures.firstOrNull() ?: intent.getGesture() ?: Gesture.ONE_FINGER_TOUCH
     }
 
     private val instructions: Boolean by lazy {
@@ -62,52 +62,66 @@ class GestureActivity : ToolbarActivity(), GestureViewCallback {
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-
+            // Received kill event
             intent?.getBooleanExtra(Constants.SERVICE_KILLED, false)?.let { killed ->
                 Log.d(TAG, "ScreenReaderService has been killed")
             }
 
+            // Received gesture event
             (intent?.getSerializableExtra(Constants.SERVICE_GESTURE) as? Gesture)?.let { gesture ->
-                if(dialog != null){
-                    dialog?.onAccessibilityGesture(gesture)
-                }else{
-                    gestureView.onAccessibilityGesture(gesture)
+                if (dialog != null) {
+                    dialog?.onAccessibilityGesture(gesture) // Pass gesture to AlertDialog if shown.
+                } else {
+                    gestureView.onAccessibilityGesture(gesture) // Pass gesture to GestureView.
                 }
             }
         }
     }
 
     override fun getLayoutId() = R.layout.activity_gesture
+
     override fun getToolbarTitle(): SpannableString {
         return SpannableString("")
     }
-        override fun onViewCreated() {
+
+    override fun onViewCreated() {
         super.onViewCreated()
 
-        gestureView = gesture.view(this) as GestureView
+        // Initialize container
+        container = findViewById(R.id.container)
+        titleTextView = findViewById(R.id.titleTextView)
+        descriptionTextView = findViewById(R.id.descriptionTextView)
+        gestureImageView = findViewById(R.id.gestureImageView)
+        feedbackTextView = findViewById(R.id.feedbackTextView)
+
+        // Setup GestureView
+        gestureView = gesture.view(this)
         gestureView.callback = this
         container.addView(gestureView)
         Accessibility.setTraversalOrder(gestureView)
 
+        // Setup other views
         titleTextView.text = gesture.title(this)
         descriptionTextView.text = gesture.description(this)
         gestureImageView.setImageResource(gesture.image(this))
 
-        if(instructions){
+        // Setup instructions
+        if (instructions) {
             Accessibility.label(container, String.format("%s. %s", titleTextView.text, descriptionTextView.text))
-        }else{
+        } else {
             descriptionTextView.setVisible(false)
             gestureImageView.setVisible(false)
             Accessibility.label(container, titleTextView.text)
         }
 
+        // Listen to events from ScreenReaderService
         val filter = IntentFilter()
         filter.addAction(Constants.SERVICE_ACTION)
         registerReceiver(receiver, filter)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if(instructions){
+        if (instructions) {
             menuInflater.inflate(R.menu.explanation, menu)
         }
         return true
@@ -121,32 +135,31 @@ class GestureActivity : ToolbarActivity(), GestureViewCallback {
         return false
     }
 
-
     override fun onDestroy() {
         unregisterReceiver(receiver)
         dialog?.dismiss()
         super.onDestroy()
     }
 
-    override fun onResume(){
+    override fun onResume() {
         super.onResume()
 
-        if(Accessibility.screenReader(this)){
-            if(ScreenReaderService.isEnabled(this)){
-                Timer().schedule(500){
-                    runOnUiThread{
+        if (Accessibility.screenReader(this)) {
+            if (ScreenReaderService.isEnabled(this)) {
+                Timer().schedule(500) {
+                    runOnUiThread {
                         Accessibility.focus(gestureView)
                     }
                 }
-            }else{
-                showError(R.string.service_disabled_error){
+            } else {
+                showError(R.string.service_disabled_error) {
                     finish()
                 }
             }
         }
     }
 
-    override fun correct(gesture: Gesture){
+    override fun correct(gesture: Gesture) {
         finished = true
         feedbackTextView.visibility = View.GONE
 
@@ -154,38 +167,40 @@ class GestureActivity : ToolbarActivity(), GestureViewCallback {
         gesture.completed(baseContext, true)
         setResult(RESULT_OK)
 
-        toast(R.string.gesture_completed_message){
-            if(isPracticing){
+        toast(R.string.gesture_completed_message) {
+            if (isPracticing) {
                 next()
             }
             finish()
         }
     }
-    private fun next(){
+
+    private fun next() {
         gestures.removeAt(0)
 
-        startActivity<GestureActivity>{
+        startActivity<GestureActivity> {
             setGestures(gestures)
             setInstructions(instructions)
         }
     }
 
-    override fun incorrect(gesture: Gesture, feedback: SpannableString){
-        if(finished){
+    override fun incorrect(gesture: Gesture, feedback: SpannableString) {
+        if (finished) {
             return
         }
 
-        val feedback = if(instructions){
+        val feedback = if (instructions) {
             feedback
-        }else{
+        } else {
             getSpannable(R.string.gestures_feedback_incorrect)
         }
 
+        // Show feedback
         feedbackTextView.animate()
             .alpha(0.0f)
-            .setDuration(500)
+            .setDuration(250)
             .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
+                override fun onAnimationEnd(animator: Animator) {
                     if (finished) {
                         return
                     }
@@ -195,23 +210,25 @@ class GestureActivity : ToolbarActivity(), GestureViewCallback {
                 }
             })
 
+        // Check if error count exceeds limit
         errorCount++
-        if(errorCount < errorLimit) {
+        if (errorCount < errorLimit) {
             return
         }
 
+        // Show option dialog
         val incorrectMessage = getSpannable(R.string.gestures_feedback_incorrect_amount, errorCount)
 
-        val actionMessage = if(Accessibility.screenReader(this)){
-            if(isPracticing){
+        val actionMessage = if (Accessibility.screenReader(this)) {
+            if (isPracticing) {
                 getSpannable(R.string.gestures_feedback_wrong_action_talkback_practice)
-            }else{
+            } else {
                 getSpannable(R.string.gestures_feedback_wrong_action_talkback)
             }
-        }else{
-            if(isPracticing){
+        } else {
+            if (isPracticing) {
                 getSpannable(R.string.gestures_feedback_wrong_action_practice)
-            }else{
+            } else {
                 getSpannable(R.string.gestures_feedback_wrong_action)
             }
         }
@@ -220,10 +237,10 @@ class GestureActivity : ToolbarActivity(), GestureViewCallback {
 
         val builder = AlertDialog.Builder(this)
             .setMessage(message)
-            .setPositiveButton(getSpannable(R.string.action_continue)){ _, _ ->
+            .setPositiveButton(getSpannable(R.string.action_continue)) { _, _ ->
                 errorLimit *= 2
             }
-            .setNegativeButton(getSpannable(R.string.action_stop)){ _, _ ->
+            .setNegativeButton(getSpannable(R.string.action_stop)) { _, _ ->
                 finish()
             }
             .setCancelable(false)
@@ -231,17 +248,15 @@ class GestureActivity : ToolbarActivity(), GestureViewCallback {
                 dialog = null
             }
 
-        if(isPracticing){
-            builder.setNeutralButton(getSpannable(R.string.action_skip)){ _,_ ->
+        if (isPracticing) {
+            builder.setNeutralButton(getSpannable(R.string.action_skip)) { _, _ ->
                 next()
                 finish()
             }
         }
 
-        if(dialog == null){
+        if (dialog == null) {
             dialog = builder.show()
         }
     }
 }
-
-

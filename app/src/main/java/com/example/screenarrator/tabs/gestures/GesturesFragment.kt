@@ -11,7 +11,6 @@ import com.example.screenarrator.adapters.textResourceAdapterDelegate
 import com.example.screenarrator.adapters.trainingAdapterDelegate
 import com.example.screenarrator.extensions.*
 import com.example.screenarrator.helpers.Accessibility
-import com.example.screenarrator.helpers.Preferences
 import com.example.screenarrator.model.Gesture
 import com.example.screenarrator.model.Header
 import com.example.screenarrator.services.ScreenReaderService
@@ -84,7 +83,7 @@ class GesturesFragment : ListFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.action_practice){
+        if (item.itemId == R.id.action_practice) {
             onPracticeClicked()
             return true
         }
@@ -94,14 +93,14 @@ class GesturesFragment : ListFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (resultCode == Activity.RESULT_OK){
+        if (resultCode == Activity.RESULT_OK) {
             adapter.notifyDataSetChanged()
             activity?.requestReview()
         }
     }
 
-    private fun onGestureClicked(gesture: Gesture){
-        if (Accessibility.screenReader(context)){
+    private fun onGestureClicked(gesture: Gesture) {
+        if (Accessibility.screenReader(context)) {
             context?.showDialog(R.string.service_talkback_enabled_title, R.string.service_talkback_enabled_message)
             return
         }

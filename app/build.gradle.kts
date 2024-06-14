@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.firebase.crashlytics)
 
+    id ("org.jetbrains.kotlin.android") version "1.9.23"
     id("com.google.gms.google-services") version "4.4.2"
 }
 
@@ -63,6 +63,9 @@ dependencies {
 
     // Add the Firebase Crashlytics SDK.
     implementation ("com.google.firebase:firebase-crashlytics:19.0.1")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
 
     //Google Play
     implementation("com.google.android.play:review:2.0.1")

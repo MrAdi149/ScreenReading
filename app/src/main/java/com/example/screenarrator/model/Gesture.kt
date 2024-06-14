@@ -78,7 +78,7 @@ enum class Gesture(
         return context.resources.getIdentifier("gesture_${identifier}", "drawable", context.packageName)
     }
 
-    fun view(context: Context): Any {
+    fun view(context: Context): GestureView {
         return when (this) {
             ONE_FINGER_TOUCH -> {
                 TouchGestureView(context, this)

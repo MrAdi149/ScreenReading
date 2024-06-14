@@ -12,42 +12,44 @@ import com.example.screenarrator.model.Header
 import com.example.screenarrator.model.Item
 import com.example.screenarrator.model.Training
 
-fun headerAdapterDelegate() = adapterDelegate<Header,Any>(R.layout.view_header){
+fun headerAdapterDelegate() = adapterDelegate<Header, Any>(R.layout.view_header) {
     val header: TextView = findViewById(R.id.headerView)
 
-    bind{
+    bind {
         header.text = item.title(context)
         Accessibility.heading(header, true)
     }
 }
 
-fun textAdapterDelegate() = adapterDelegate<String, Any>(R.layout.view_text){
+fun textAdapterDelegate() = adapterDelegate<String, Any>(R.layout.view_text) {
     val textView: TextView = findViewById(R.id.textView)
 
-    bind{
+    bind {
         textView.text = item
     }
 }
 
-fun textResourceAdapterDelegate() = adapterDelegate<Int, Any>(R.layout.view_text){
+fun textResourceAdapterDelegate() = adapterDelegate<Int, Any>(R.layout.view_text) {
     val textView: TextView = findViewById(R.id.textView)
     val marginMedium = context.resources.getDimension(R.dimen.margin_medium).toInt()
     val marginSmall = context.resources.getDimension(R.dimen.margin_small).toInt()
 
     bind {
         textView.text = context.getSpannable(item)
-        when(adapterPosition){
-            0-> textView.setPadding(marginMedium)
-            -1-> textView.setPadding(marginMedium)
+
+        when (adapterPosition) {
+            0 -> textView.setPadding(marginMedium)
+            -1 -> textView.setPadding(marginMedium) // TODO: Replace -1 with last index
             else -> textView.setPadding(marginMedium, 0, marginMedium, marginSmall)
         }
     }
 }
 
-inline fun <reified T: Item> itemAdapterDelegate(crossinline callback: (T) -> Unit) =
-    adapterDelegate<T,Any>(R.layout.view_item){
+inline fun <reified T : Item> itemAdapterDelegate(crossinline callback: (T) -> Unit) =
+    adapterDelegate<T, Any>(R.layout.view_item) {
         val textView: TextView = findViewById(R.id.textView)
-        itemView.setOnClickListener{
+
+        itemView.setOnClickListener {
             callback(item)
         }
 
@@ -58,16 +60,17 @@ inline fun <reified T: Item> itemAdapterDelegate(crossinline callback: (T) -> Un
         }
     }
 
-inline fun <reified T: Training> trainingAdapterDelegate(crossinline callback: (T) -> Unit) =
-    adapterDelegate<T, Any>(R.layout.view_training){
+
+inline fun <reified T : Training> trainingAdapterDelegate(crossinline callback: (T) -> Unit) =
+    adapterDelegate<T, Any>(R.layout.view_training) {
         val textView: TextView = findViewById(R.id.textView)
         val imageView: ImageView = findViewById(R.id.imageView)
 
-        itemView.setOnClickListener{
+        itemView.setOnClickListener {
             callback(item)
         }
 
-        bind{
+        bind {
             val title = item.title(context)
             val completed = item.completed(context)
 
@@ -76,10 +79,10 @@ inline fun <reified T: Training> trainingAdapterDelegate(crossinline callback: (
             Accessibility.label(itemView, title)
             Accessibility.button(itemView, true)
 
-            if(completed){
+            if (completed) {
                 imageView.setVisible(true)
                 Accessibility.state(itemView, context.getSpannable(R.string.action_completed))
-            }else{
+            } else {
                 imageView.setVisible(false)
                 Accessibility.state(itemView, null)
             }

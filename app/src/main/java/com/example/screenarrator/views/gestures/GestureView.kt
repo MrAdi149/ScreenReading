@@ -23,7 +23,8 @@ interface GestureViewCallback{
     fun incorrect(gesture: Gesture, feedback: SpannableString)
 }
 
-abstract class GestureView(val gesture: Gesture, context: Context): View(context){
+abstract class GestureView(val gesture: Gesture, context: Context) : View(context) {
+
     private val TAG = "GestureView"
     private val CLASS_NAME = GestureView::class.java.name
 
@@ -40,24 +41,26 @@ abstract class GestureView(val gesture: Gesture, context: Context): View(context
 
     var touches = mutableMapOf<Int, ArrayList<Touch>>()
     var correct = false
-
+    
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         touches.clear()
         invalidate()
     }
 
-    override fun onDraw(canvas: Canvas){
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         touches.entries.forEach { entry ->
             val touches = entry.value
 
+            // Draw circle(s) around first touch.
             touches.firstOrNull()?.let { touch ->
                 drawCircle(canvas, paint, touch)
             }
 
-            if(touches.size >= 5){
+            // Draw lines.
+            if (touches.size >= 5) {
                 drawLines(canvas, paint, touches)
                 drawArrowHead(canvas, paint, touches)
             }
@@ -69,34 +72,37 @@ abstract class GestureView(val gesture: Gesture, context: Context): View(context
         paint: Paint,
         touch: Touch,
         size: Float = paint.strokeWidth * 2
-    ){
-      val offset = paint.strokeWidth / 2
-      val x = touch.x.toFloat() - offset
-      val y = touch.y.toFloat() - offset
+    ) {
+        val offset = paint.strokeWidth / 2
+        val x = touch.x.toFloat() - offset
+        val y = touch.y.toFloat() - offset
 
-      var i = 0
-      while(i < touch.taps){
-          val radius = size * (i + 1)
-          if(i == 0 && touch.longPress){
-              paint.style = Paint.Style.FILL
-          }else{
-              paint.style = Paint.Style.STROKE
-          }
-          canvas.drawCircle(x,y,radius,paint)
-          i++
-      }
+        var i = 0
+        while(i < touch.taps) {
+            val radius = size * (i+1)
+
+            if (i == 0 && touch.longPress) {
+                paint.style = Paint.Style.FILL
+            } else {
+                paint.style = Paint.Style.STROKE
+            }
+            canvas.drawCircle(x, y, radius, paint)
+
+            i++
+        }
     }
 
     private fun drawLines(
         canvas: Canvas,
         paint: Paint,
         touches: List<Touch>
-    ){
+    ) {
         paint.style = Paint.Style.STROKE
 
         touches.forEachIndexed { index, t1 ->
-            if(index < touches.size - 1){
+            if (index < touches.size - 1) {
                 val t2 = touches[index+1]
+
                 drawLine(canvas, paint, t1, t2)
             }
         }
@@ -107,7 +113,7 @@ abstract class GestureView(val gesture: Gesture, context: Context): View(context
         paint: Paint,
         touch1: Touch,
         touch2: Touch
-    ){
+    ) {
         val offset = paint.strokeWidth / 2
 
         paint.style = Paint.Style.STROKE
@@ -126,54 +132,59 @@ abstract class GestureView(val gesture: Gesture, context: Context): View(context
         touches: List<Touch>,
         arrowSize: Float = paint.strokeWidth * 3,
         arrowAngle: Float = 45f
-    ){
+    ) {
+        // Use a subset of 10 points
         val subset = touches.takeLast(10)
-        if(subset.size < 10){
+        if (subset.size < 10) {
             return
         }
-
         val t1 = subset.first()
         val t2 = subset.last()
 
+        // Determine start and end coordinates
         val offset = paint.strokeWidth / 2
         val x1 = t1.x - offset
         val y1 = t1.y - offset
         val x2 = t2.x - offset
         val y2 = t2.y - offset
 
+        // Calculate points of left and right side of arrow
         val leftPoints = floatArrayOf(x2 - arrowSize, y2, x2, y2)
-        val rightPoints = floatArrayOf(x2, y2, x2, y2+arrowSize)
+        val rightPoints = floatArrayOf(x2, y2, x2, y2 + arrowSize)
 
-        val angle = atan2((y2 - y1).toDouble(), (x2 - x1).toDouble()) * 100 / Math.PI + arrowAngle
+        // Calculate angle
+        val angle = atan2((y2 - y1).toDouble(), (x2 - x1).toDouble()) * 180 / Math.PI + arrowAngle
 
+        // Rotate the matrix around the angle
         val matrix = Matrix()
         matrix.setRotate(angle.toFloat(), x2, y2)
         matrix.mapPoints(leftPoints)
         matrix.mapPoints(rightPoints)
 
+        // Draw arrow
         paint.style = Paint.Style.STROKE
         canvas.drawLine(leftPoints[0], leftPoints[1], leftPoints[2], leftPoints[3], paint)
         canvas.drawLine(rightPoints[0], rightPoints[1], rightPoints[2], rightPoints[3], paint)
     }
 
-    fun showTouches(event: MotionEvent?, taps: Int = 1, longPress: Boolean = false){
-        if(event != null){
+    fun showTouches(event: MotionEvent?, taps: Int = 1, longPress: Boolean = false) {
+        if (event != null) {
             val touches = mutableMapOf<Int, ArrayList<Touch>>()
-            for(i in 0 until event.pointerCount){
+            for (i in 0 until event.pointerCount) {
                 val id = event.getPointerId(i)
                 val coordinates = touches[id] ?: arrayListOf()
 
                 val x = event.getX(i).toInt()
                 val y = event.getY(i).toInt()
 
-                coordinates.add(Touch(x,y,taps,longPress))
+                coordinates.add(Touch(x, y, taps, longPress))
                 touches[id] = coordinates
             }
             showTouches(touches)
         }
     }
 
-    fun showTouches(touches: MutableMap<Int, ArrayList<Touch>>){
+    fun showTouches(touches: MutableMap<Int, ArrayList<Touch>>) {
         this.touches = touches
         invalidate()
     }
@@ -186,8 +197,8 @@ abstract class GestureView(val gesture: Gesture, context: Context): View(context
     override fun onHoverEvent(event: MotionEvent?): Boolean {
         Log.d(TAG, "onHoverEvent: $event")
 
-        if(Accessibility.screenReader(context) && event != null){
-            when(event.action){
+        if (Accessibility.screenReader(context) && event != null) {
+            when (event.action) {
                 MotionEvent.ACTION_HOVER_ENTER -> {
                     event.action = MotionEvent.ACTION_DOWN
                 }
@@ -200,47 +211,45 @@ abstract class GestureView(val gesture: Gesture, context: Context): View(context
             }
             return onTouchEvent(event)
         }
+
         return super.onHoverEvent(event)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if(correct){
+        if (correct) {
             return true
         }
 
         Log.d(TAG, "onTouchEvent: $event")
 
-        if(event != null && event.pointerCount > 0){
-            if(event.isStart()){
+        if (event != null && event.pointerCount > 0) {
+            if (event.isStart()) {
                 touches.clear()
             }
 
-            for(i in 0 until event.pointerCount){
-                if(event.isStart()){
-                    touches.clear()
-                }
+            for (i in 0 until event.pointerCount) {
+                val id = event.getPointerId(i)
+                val coordinates = touches[id] ?: arrayListOf()
 
-                for(i in 0 until event.pointerCount){
-                    val id = event.getPointerId(i)
-                    val coordinates = touches[id] ?: arrayListOf()
+                val x = event.getX(i).toInt()
+                val y = event.getY(i).toInt()
 
-                    val x = event.getX(i).toInt()
-                    val y = event.getY(i).toInt()
-
-                    if(coordinates.size > 0){
-                        val lastTouch = coordinates.last()
-                        if(lastTouch.x == x && lastTouch.y == y){
-                            Log.d(TAG, "Duplicate touch ignored")
-                            continue
-                        }
+                if (coordinates.size > 0) {
+                    val lastTouch = coordinates.last()
+                    if (lastTouch.x == x && lastTouch.y == y) {
+                        Log.d(TAG, "Duplicate touch ignored")
+                        continue
                     }
-                    Log.d(TAG,"Point index $id touches position ($x, $y)")
-                    coordinates.add(Touch(x,y))
-                    this.touches[id] = coordinates
                 }
-                invalidate()
+
+                Log.d(TAG, "Point index $i with id $id touches position ($x, $y)")
+
+                coordinates.add(Touch(x, y))
+                this.touches[id] = coordinates
             }
+            invalidate()
         }
+
         return super.onTouchEvent(event)
     }
 
@@ -258,15 +267,15 @@ abstract class GestureView(val gesture: Gesture, context: Context): View(context
 
     var callback: GestureViewCallback? = null
 
-    open fun correct(){
-        if(!correct){
+    open fun correct() {
+        if (!correct) {
             correct = true
             callback?.correct(gesture)
         }
     }
 
-    open fun incorrect(feedback: Int, vararg arguments: Any){
-        if(!correct){
+    open fun incorrect(feedback: Int, vararg arguments: Any) {
+        if (!correct) {
             val message = context.getSpannable(feedback, *arguments)
             callback?.incorrect(gesture, message)
         }

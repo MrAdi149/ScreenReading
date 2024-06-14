@@ -20,7 +20,6 @@ class ActionActivity: ToolbarActivity(), ActionViewCallback {
     private lateinit var scrollView: ScrollView
 
     private val action: Action by lazy {
-        val intent = Intent()
         intent.doGetAction() ?: Action.SELECT
     }
 
@@ -28,17 +27,18 @@ class ActionActivity: ToolbarActivity(), ActionViewCallback {
 
     override fun getToolbarTitle() = action.title(this)
 
-    override fun onViewCreated(){
+    override fun onViewCreated() {
         super.onViewCreated()
 
         val view = action.view(this)
         view.callback = this
         scrollView.addView(view)
 
-        Accessibility.accessibilityManager(this)?.let{ manager->
+        // Listen to accessibility state changes
+        Accessibility.accessibilityManager(this)?.let { manager ->
             manager.addAccessibilityStateChangeListener {
-                if(manager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_SPOKEN).isEmpty()){
-                    showDialog(R.string.actions_talkback_disabled_title, R.string.actions_talkback_disabled_message){
+                if (manager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_SPOKEN).isEmpty()) {
+                    showDialog(R.string.actions_talkback_disabled_title, R.string.actions_talkback_disabled_message) {
                         finish()
                     }
                 }
@@ -46,22 +46,25 @@ class ActionActivity: ToolbarActivity(), ActionViewCallback {
         }
     }
 
-    override fun correct(action: Action){
+    override fun correct(action: Action) {
         val elapsedTime = (System.currentTimeMillis() - startTime).toInt() / 1000
         events.log(Events.Category.action_completed, action.identifier, elapsedTime)
 
         action.completed(this, true)
         setResult(RESULT_OK)
 
-        toast(R.string.action_completed_message)
+        toast(R.string.action_completed_message) {
+            finish()
+        }
     }
 
-    override fun incorrect(action: Action, feedback: SpannableString){
+    override fun incorrect(action: Action, feedback: SpannableString) {
         toast(feedback)
     }
 
-    override fun startActivity(intent: Intent){
-        if(intent.action == Intent.ACTION_VIEW){
+    override fun startActivity(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_VIEW) {
+            // Ignore view actions
             return
         }
         super.startActivity(intent)

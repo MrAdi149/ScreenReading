@@ -65,6 +65,7 @@ class SwipeGestureView(context: Context, gesture: Gesture): GestureView(gesture,
     }
 
     private val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener(){
+
         private val THRESHOLD = 15
         private var path = arrayListOf<Direction>()
 

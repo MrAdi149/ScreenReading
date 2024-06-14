@@ -22,10 +22,12 @@ abstract class ListFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        recyclerView = view.findViewById(R.id.recyclerView) // Initialize recyclerView here
+
         adapter.items = items
         recyclerView.adapter = adapter
 
-        if(decoration){
+        if (decoration) {
             recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         }
     }

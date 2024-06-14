@@ -16,7 +16,7 @@ class LinkTextView(
     init {
         autoLinkMask = Linkify.ALL
         movementMethod = LinkMovementMethod.getInstance()
-        linksClickable = true // Make links clickable
+        linksClickable = false // Make links clickable
         isClickable = false // Prevent the entire view from being clickable
     }
 

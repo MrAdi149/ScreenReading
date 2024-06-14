@@ -8,7 +8,8 @@ import com.example.screenarrator.R
 abstract class ToolbarActivity : BaseActivity() {
 
     var toolbar: Toolbar? = null
-    abstract fun getToolbarTitle(): SpannableString
+
+    abstract fun getToolbarTitle(): SpannableString?
 
     override fun onViewCreated() {
         super.onViewCreated()
